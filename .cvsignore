@@ -2,3 +2,5 @@ createDatabaseTester
 eig3Rec
 eig3Train
 .makedeps
+*.dat
+*.out
