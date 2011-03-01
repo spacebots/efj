@@ -5,6 +5,7 @@
 #include <string>
 #include <boost/filesystem.hpp>
 #include <Eigen/Core>
+#include <Eigen/QR>
 #include <QString>
 
 #include "misc.h"
@@ -15,23 +16,35 @@ namespace efj {
 
   class Database {
 
+  public:
+    typedef Eigen::EigenSolver<Eigen::MatrixXd>::EigenvalueType eigenvalue_type;
+    typedef Eigen::EigenSolver<Eigen::MatrixXd>::EigenvectorsType eigenvectors_type;
+
+  private:
     // this matrix may become so large it won't fit in the stack
     // so, we allocate it on the heap
-    Eigen::MatrixXi *_pixels; // M*N x P
+    Eigen::MatrixXi _pixels; // M*N x P
 
     int _nImages; // typically, _pixels->cols()
     int _features; // typically, _pixels->rows()
+
+    int _grouping;  // how many faces per subject
+    int _nGroups;   // number of subjects
 
     Eigen::VectorXd _mean;
     Eigen::MatrixXd _centeredPixels; //[M*N x P] - [mean] ///usar new
 
     Eigen::MatrixXd _eigenfaces;
+    Eigen::MatrixXd _clustersProjection;
 
   public:
 
+    // empty database: should use "read" to fill up data.
+    inline Database() {}
+
     //dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/MyTrainDatabase"
     //dir = "/afs/l2f.inesc-id.pt/home/ferreira/FaceRec/ImageVault/train";
-    Database(const std::string &dir);
+    Database(const std::string &dir, int grouping);
 
     /**
      * in this directory, seach for file with given extension
@@ -42,15 +55,20 @@ namespace efj {
 
     bool load_pixels(const std::string &trainDatabasePath);
 
-    void readSingleFile(std::string pathToFile, Eigen::VectorXi &testImg);
-
     void compute_eigenfaces();
+
+    void project_clusters();
+    void project_single_image(Eigen::VectorXi &image, Eigen::VectorXd &projection);
+    void compute_distance_to_groups(Eigen::VectorXd &projection, Eigen::VectorXd &distances);
 
     void debug_print_pixels();
     void debug_print_mean();
     void debug_print_centeredPixels();
+    void debug_print_eigenvectors(eigenvalue_type &eigenValues, eigenvectors_type &eigenVectors);
+    void debug_print_covariance_matrix(Eigen::MatrixXd &covMatrix);
 
-    void write(const char *output_file = "matrix.out");
+    void read(const char *input_file = "efjdb.dat");
+    void write(const char *output_file = "efjdb.dat");
 
   };
 
