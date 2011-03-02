@@ -10,6 +10,7 @@
 #include "Database.h"
 
 //CONSEGUES LER ISTO???
+//SIM
 
 /**
  *
