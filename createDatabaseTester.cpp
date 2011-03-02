@@ -73,7 +73,7 @@ int main() {
      //std::cin >> testImgPath;
 
      Eigen::VectorXi testImg;
-     efj::readSingleFile(files[i], testImg);
+     efj::readSingleFile(files[i].toStdString(), testImg);
 
      Eigen::VectorXd projection;
      efjdb.project_single_image(testImg, projection);
