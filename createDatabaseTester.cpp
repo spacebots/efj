@@ -9,6 +9,8 @@
 #include <Eigen/Core>
 #include "Database.h"
 
+//CONSEGUES LER ISTO???
+
 /**
  *
  * This function DOES NOT get the files sequentially..
