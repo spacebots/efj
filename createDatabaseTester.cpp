@@ -82,7 +82,6 @@ int main() {
      efjdb.compute_distance_to_groups(projection, distances);
 
 
-
      if(find_min(distances) == subject){
     	 certas++;
      }
