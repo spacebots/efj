@@ -34,6 +34,18 @@ void find_files(const bf::path & dir_path, const std::string & extension,
   }
 }
 
+//finds minimum value of the vector returning its index
+int find_min(Eigen::VectorXi vec){
+	int min = vec[0];
+	int index = 0;
+	for(int i = 1, aux = 0 ; i < vec.size() ; i++){
+		if(aux < min){
+			index = i;
+		}
+	}
+	return index;
+}
+
 int main() {
 
   const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/ImageVault/train";
@@ -44,11 +56,15 @@ int main() {
   std::sort(files.begin(), files.end());
 
   //load the matrix
-  //efj::Database efjdb;
-  //efjdb.read("batata.dat");
+  efj::Database efjdb;
+  efjdb.read("batata.dat");
+
+  int certas;
+  int erradas;
 
 
-  for(int i = 0 ; i < files.size() ; i++) {
+  for(int i = 0 , subject ; i < files.size() ; i++) {
+
 
      //std::cerr << "Test image path:" << std::endl;
      //std::string testImgPath;
@@ -62,6 +78,20 @@ int main() {
 
      Eigen::VectorXd distances;
      efjdb.compute_distance_to_groups(projection, distances);
+
+
+
+     if(find_min(distances) == subject){
+    	 certas++;
+     }
+     else{
+    	 erradas++;
+     }
+
+
+     std::cerr << "Certas: " << certas << std::endl;
+     std::cerr << "Erradas: " << erradas << std::endl;
+
 
      //std::cerr << distances;
      //std::cerr << "Done" << std::endl;
