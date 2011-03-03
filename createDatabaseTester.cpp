@@ -9,8 +9,6 @@
 #include <Eigen/Core>
 #include "Database.h"
 
-//CONSEGUES LER ISTO???
-//SIM
 
 /**
  *
@@ -63,13 +61,13 @@ int main() {
 
   //load the matrix
   efj::Database efjdb;
-  efjdb.read("batata.dat");
+  efjdb.read("/ofs/tmp/david/batata.dat");
 
-  int certas;
-  int erradas;
+  int certas = 0;
+  int erradas = 0;
 
 
-  for(int i = 0 , subject ; i < files.size() ; i++) {
+  for(int i = 0 , subject = 0; i < (int)files.size() ; i++) {
 
 
      //std::cerr << "Test image path:" << std::endl;
