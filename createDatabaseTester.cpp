@@ -52,8 +52,9 @@ int find_min(Eigen::VectorXi vec){
 
 int main() {
 
-  const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/ImageVault/train";
-
+  //const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/ImageVault/train";
+	const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/ImageVault/test";
+  //const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/MyTrainDatabase";
   std::vector<QString> files;
 
   find_files(dir, ".jpg", files);
@@ -62,6 +63,7 @@ int main() {
   //load the matrix
   efj::Database efjdb;
   efjdb.read("/ofs/tmp/david/batata.dat");
+  //efjdb.read("batata.dat");
 
   int certas = 0;
   int erradas = 0;
@@ -92,8 +94,7 @@ int main() {
      }
 
 
-     std::cerr << "Certas: " << certas << std::endl;
-     std::cerr << "Erradas: " << erradas << std::endl;
+
 
 
      //std::cerr << distances;
@@ -103,6 +104,9 @@ int main() {
 
 
   }
+
+  std::cout << "Certas: " << certas << std::endl;
+  std::cout << "Erradas: " << erradas << std::endl;
 
 #if 0
   for (int i = 0; i < 500; i++) {
