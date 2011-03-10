@@ -31,8 +31,11 @@ namespace efj {
     int _grouping;  // how many faces per subject
     int _nGroups;   // number of subjects
 
+    int _topEigenValues; //top n most significative eigenValues
+
     Eigen::VectorXd _mean;
     Eigen::MatrixXd _centeredPixels; //[M*N x P] - [mean] ///usar new
+    Eigen::MatrixXd _centeredPixelsFiltered;
 
     Eigen::MatrixXd _eigenfaces;
     Eigen::MatrixXd _clustersProjection;
@@ -44,7 +47,7 @@ namespace efj {
 
     //dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/MyTrainDatabase"
     //dir = "/afs/l2f.inesc-id.pt/home/ferreira/FaceRec/ImageVault/train";
-    Database(const std::string &dir, int grouping);
+    Database(const std::string &dir, int grouping, int topEigenValues);
 
     /**
      * in this directory, seach for file with given extension
@@ -61,14 +64,27 @@ namespace efj {
     void project_single_image(Eigen::VectorXi &image, Eigen::VectorXd &projection);
     void compute_distance_to_groups(Eigen::VectorXd &projection, Eigen::VectorXd &distances);
 
+    void filter_eigenVectors(Eigen::MatrixXd &usefullVectors, eigenvalue_type &eigenValues,
+    							eigenvectors_type &eigenVectors, int _topEigenValues,
+    							std::vector< std::pair<double,int> > &selectedEigenValues);
+
     void debug_print_pixels();
     void debug_print_mean();
     void debug_print_centeredPixels();
     void debug_print_eigenvectors(eigenvalue_type &eigenValues, eigenvectors_type &eigenVectors);
     void debug_print_covariance_matrix(Eigen::MatrixXd &covMatrix);
 
-    void read(const char *input_file = "efjdb.dat");
-    void write(const char *output_file = "efjdb.dat");
+    void read(std::string input_file);
+    void write(std::string output_file);
+
+    int get_nGroups(){
+    	return _nGroups;
+    }
+
+    int get_grouping(){
+        return _grouping;
+    }
+
 
   };
 

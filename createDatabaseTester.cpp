@@ -39,74 +39,109 @@ void find_files(const bf::path & dir_path, const std::string & extension,
 }
 
 //finds minimum value of the vector returning its index
-int find_min(Eigen::VectorXi vec){
+int find_min(Eigen::VectorXd &vec){
 	int min = vec[0];
+	std::cout << min << std::endl;
 	int index = 0;
-	for(int i = 1, aux = 0 ; i < vec.size() ; i++){
-		if(aux < min){
+	for(int i = 1; i < vec.size() ; i++){
+		std::cout << min << std::endl;
+		std::cout << vec[i] << std::endl;
+		if(vec[i] < min){
+			min = vec[i];
 			index = i;
 		}
+		std::cout << index << std::endl;
 	}
 	return index;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
 
-  //const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/ImageVault/train";
-	const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/ImageVault/test";
-  //const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/MyTrainDatabase";
-  std::vector<QString> files;
+#if 0
+	Eigen::VectorXd teste(8);
+	teste << 10,20,3,4,5,6,31,20;
 
-  find_files(dir, ".jpg", files);
-  std::sort(files.begin(), files.end());
+	std::cout << "MinIndex: " << find_min(teste) << "   " << teste(find_min(teste));
 
-  //load the matrix
-  efj::Database efjdb;
-  efjdb.read("/ofs/tmp/david/batata.dat");
-  //efjdb.read("batata.dat");
+#endif
 
-  int certas = 0;
-  int erradas = 0;
+	std::string databaseDir;
+	std::string testDir;
 
-
-  for(int i = 0 , subject = 0; i < (int)files.size() ; i++) {
-
-
-     //std::cerr << "Test image path:" << std::endl;
-     //std::string testImgPath;
-     //std::cin >> testImgPath;
-
-     Eigen::VectorXi testImg;
-     efj::readSingleFile(files[i].toStdString(), testImg);
-
-     Eigen::VectorXd projection;
-     efjdb.project_single_image(testImg, projection);
-
-     Eigen::VectorXd distances;
-     efjdb.compute_distance_to_groups(projection, distances);
+	if (argc == 3) {
+		databaseDir = argv[1];
+		testDir = argv[2];
+	}
+	else {
+		std::cerr << "Usage: " << argv[0] << "  read_database_directory  read_test_directory" << std::endl;
+		exit(1);
+	}
 
 
-     if(find_min(distances) == subject){
-    	 certas++;
-     }
-     else{
-    	 erradas++;
-     }
+	//const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/ImageVault/train";
+	//const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/ImageVault/test";
+	//const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/MyTrainDatabase";
+	std::vector<QString> files;
+
+	find_files(testDir, ".jpg", files);
+	std::sort(files.begin(), files.end());
+
+	//load the matrix
+	efj::Database efjdb;
+	//efjdb.read("/ofs/tmp/david/batata.dat");
+	efjdb.read(databaseDir);
+
+	int grouping = efjdb.get_grouping();
+	int nGroups = efjdb.get_nGroups();
+
+	int certas = 0;
+	int erradas = 0;
+
+	int aux = 0;
+
+	for(int i = 0 , subject = 0; i < (int)files.size() && subject < nGroups ; i++ , aux++) {
+
+
+		//std::cerr << "Test image path:" << std::endl;
+		//std::string testImgPath;
+		//std::cin >> testImgPath;
+
+		if(aux == grouping){
+			subject++;
+			aux = 0;
+		}
+
+		Eigen::VectorXi testImg;
+		efj::readSingleFile(files[i].toStdString(), testImg);
+
+		Eigen::VectorXd projection;
+		efjdb.project_single_image(testImg, projection);
+
+		Eigen::VectorXd distances;
+		efjdb.compute_distance_to_groups(projection, distances);
+
+
+		if(find_min(distances) == subject){
+			certas++;
+		}
+		else{
+			erradas++;
+		}
 
 
 
 
 
-     //std::cerr << distances;
-     //std::cerr << "Done" << std::endl;
+		//std::cerr << distances;
+		//std::cerr << "Done" << std::endl;
 
 
 
 
-  }
+	}
 
-  std::cout << "Certas: " << certas << std::endl;
-  std::cout << "Erradas: " << erradas << std::endl;
+	std::cout << "Certas: " << certas << std::endl;
+	std::cout << "Erradas: " << erradas << std::endl;
 
 #if 0
   for (int i = 0; i < 500; i++) {

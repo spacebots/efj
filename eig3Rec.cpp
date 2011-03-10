@@ -3,8 +3,23 @@
 
 int main(int argc, char *argv[]) {
 
-  efj::Database efjdb;
-  efjdb.read("batata.dat");
+	std::string readDir;
+
+	if (argc == 2) {
+		readDir = argv[1];
+	}
+	else {
+		std::cerr << "Usage: " << argv[0] << "  read_database_directory" << std::endl;
+		exit(1);
+	}
+
+	//"/ofs/tmp/eigDataBase1.dat"
+
+	efj::Database efjdb;
+	efjdb.read(readDir);
+	//efjdb.read("ofs/tmp/eigDataBaseYaleBExtendedCroped.dat");
+
+
 
   while (true) {
 

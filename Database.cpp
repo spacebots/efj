@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <utility>
 #include <fstream>
 #include <iostream>
 #include <boost/filesystem.hpp>
@@ -10,18 +11,20 @@
 #include <QImage>
 #include <QString>
 
+
 #include "Database.h"
 
 namespace bf = boost::filesystem;
 
-efj::Database::Database(const std::string &dir, int grouping) :
-  _grouping(grouping) {
+efj::Database::Database(const std::string &dir, int grouping, int topEigenValues) :
+  _grouping(grouping) , _topEigenValues(topEigenValues){
   load_pixels(dir);
   debug_print_pixels();
 
   _nImages = _pixels.cols();
   _features = _pixels.rows(); //number of pixels, column size
   _nGroups = _nImages / _grouping;
+
 
   _mean.resize(_features);
 
@@ -51,8 +54,8 @@ efj::Database::Database(const std::string &dir, int grouping) :
   std::cerr << "pixels centered\n";
   debug_print_centeredPixels();
 
-  _eigenfaces.resize(_features, _nImages);
-  initialize(_eigenfaces); //initialize matriz to zeroes
+  //_eigenfaces.resize(_features, _nImages);
+  //initialize(_eigenfaces); //initialize matriz to zeroes
 }
 
 /**
@@ -125,6 +128,30 @@ void efj::Database::compute_eigenfaces() {
 
   debug_print_eigenvectors(eigenValues, eigenVectors);
 
+  Eigen::MatrixXd usefullVectors;
+
+  std::vector< std::pair<double,int> > selectedEigenValues;
+
+  filter_eigenVectors(usefullVectors , eigenValues , eigenVectors, _topEigenValues, selectedEigenValues);
+
+  _eigenfaces.resize(_features, _topEigenValues);
+  initialize(_eigenfaces); //initialize matriz to zeroes
+
+  _centeredPixelsFiltered.resize(_features, _topEigenValues);
+  for(int i = 0 ; i < _topEigenValues ; i++){
+	  _centeredPixelsFiltered.col(i) = _centeredPixels.col(selectedEigenValues.at(i).second);
+  }
+
+
+#pragma omp parallel for
+  for (int i = 0; i < _topEigenValues; i++) {//i = col
+#pragma omp parallel for
+    for (int j = 0; j < _topEigenValues; j++) { // j = row
+      _eigenfaces.col(i) += _centeredPixelsFiltered.col(j) * usefullVectors(j, i);
+    }
+  }
+
+#if 0
 #pragma omp parallel for
   for (int i = 0; i < _nImages; i++) {//i = col
 #pragma omp parallel for
@@ -132,10 +159,70 @@ void efj::Database::compute_eigenfaces() {
       _eigenfaces.col(i) += _centeredPixels.col(j) * eigenVectors(j, i).real();
     }
   }
+#endif
 
   std::cerr << "all done" << std::endl;
 }
 
+void efj::Database::project_clusters() {
+  std::cerr << "Projecting Training Images" << std::endl;
+
+  _clustersProjection.resize(_nImages, _nGroups);
+
+  Eigen::VectorXd trainingFaceEqualized(_features);
+  for (int image = 0, group = 0; group < _nGroups; group++) {
+    initialize(_features, trainingFaceEqualized); //set vector to zeroes
+    //calculate the face group and equalize it
+    for (int i = 0; i < _grouping && image < _nImages; i++, image++) {
+      trainingFaceEqualized += _pixels.col(image).cast<double>() - _mean;
+    }
+    trainingFaceEqualized /= _grouping; //this gives the mean of images from the same group
+
+    //project it to the eigenfaces space
+#pragma omp parallel for
+    for (int i = 0; i < _topEigenValues; i++) {
+      double a = _eigenfaces.col(i).dot(trainingFaceEqualized);
+      _clustersProjection(i, group) = a;
+    }
+  }
+  std::cerr << "Projecting Training Images - DONE" << std::endl;
+}
+
+// "projection" will be resized to _topEigenValues
+void efj::Database::project_single_image(Eigen::VectorXi &image, Eigen::VectorXd &projection) {
+  //std::cerr << "Projecting Test Image" << std::endl;
+
+  Eigen::VectorXd imageEqualized(_features);
+#pragma omp parallel for
+  for (int i = 0; i < imageEqualized.size(); i++) {
+    imageEqualized(i) = std::abs(image(i) - _mean(i));
+  }
+
+  projection.resize(_topEigenValues);
+#pragma omp parallel for
+  for (int i = 0; i < _topEigenValues; i++) {
+    projection(i) = _eigenfaces.col(i).dot(imageEqualized);
+  }
+}
+
+// "distances" will be resized to _topEigenValues
+void efj::Database::compute_distance_to_groups(Eigen::VectorXd &projection, Eigen::VectorXd &distances) {
+  //std::cerr << "Calculating Distances" << std::endl;
+
+  distances.resize(_nGroups);
+
+  for (int i = 0; i < _nGroups; i++) {
+    Eigen::VectorXd aux(_topEigenValues);
+#pragma omp parallel for
+    for (int j = 0; j < _topEigenValues; j++) {
+      aux(j) = projection(j) - _clustersProjection(j, i);
+    }
+    distances(i) = aux.norm();
+  }
+
+}
+
+#if 0
 void efj::Database::project_clusters() {
   std::cerr << "Projecting Training Images" << std::endl;
 
@@ -159,6 +246,7 @@ void efj::Database::project_clusters() {
   }
 }
 
+
 // "projection" will be resized to _nImages
 void efj::Database::project_single_image(Eigen::VectorXi &image, Eigen::VectorXd &projection) {
   std::cerr << "Projecting Test Image" << std::endl;
@@ -176,6 +264,7 @@ void efj::Database::project_single_image(Eigen::VectorXi &image, Eigen::VectorXd
   }
 }
 
+
 // "distances" will be resized to _nGroups
 void efj::Database::compute_distance_to_groups(Eigen::VectorXd &projection, Eigen::VectorXd &distances) {
   std::cerr << "Calculating Distances" << std::endl;
@@ -192,9 +281,51 @@ void efj::Database::compute_distance_to_groups(Eigen::VectorXd &projection, Eige
   }
 
 }
+#endif
 
-void efj::Database::write(const char *output_file) {
-  std::ofstream mos(output_file, std::ios::binary);
+//"usefullVectors" will be resized to _topEigenValues
+void efj::Database::filter_eigenVectors(Eigen::MatrixXd &usefullVectors, eigenvalue_type &eigenValues,
+    										 eigenvectors_type &eigenVectors, int _topEigenValues,
+    										 std::vector< std::pair<double,int> > &selectedEigenValues){
+
+	if(_topEigenValues == 0){
+		_topEigenValues = _nImages;
+	}
+
+	int eigenVectorsRows = eigenVectors.rows();
+	usefullVectors.resize(eigenVectorsRows , _topEigenValues);
+
+	//std::cout << eigenVectors.rows();
+
+	//std::vector< std::pair<double,int> > selectedEigenValues;
+
+	for(int i = 0 ; i < eigenValues.size() ; i++){
+		selectedEigenValues.push_back(std::make_pair(eigenValues(i).real() , i));
+	}
+	//Eigen::VectorXd eigVal = eigenValues;
+	std::sort(selectedEigenValues.begin(), selectedEigenValues.end());
+
+#if 0
+	for(int k = 0 ; k < _nImages ; k++){
+		std::cout << selectedEigenValues.at(k).first << std::endl;
+	}
+
+	std::cerr << "PRINTED";
+#endif
+
+#pragma omp parallel for
+  for (int i = 0; i < _topEigenValues; i++) {//i = col
+#pragma omp parallel for
+    for (int j = 0; j < eigenVectorsRows; j++) { // j = row
+    	usefullVectors(j,i) = eigenVectors(j, selectedEigenValues.back().second).real();
+    }
+    selectedEigenValues.pop_back();
+  }
+
+}
+
+void efj::Database::write(std::string output_file) {
+  std::ofstream mos(output_file.c_str(), std::ios::binary);
   // store pixels
   int rows = _pixels.rows();
   int cols = _pixels.cols();
@@ -239,12 +370,15 @@ void efj::Database::write(const char *output_file) {
       mos.write((const char *)&cp, sizeof(double));
     }
   }
+
+  mos.write((char*)&_topEigenValues, sizeof(int));
+
   mos.close();
 }
 
-void efj::Database::read(const char *input_file) {
+void efj::Database::read(std::string input_file) {
   std::cerr << "reading" << "\n";
-  std::ifstream mis(input_file, std::ios::binary);
+  std::ifstream mis(input_file.c_str(), std::ios::binary);
 
   // read pixels
   mis.read((char*)&_features, sizeof(int));
@@ -287,6 +421,8 @@ void efj::Database::read(const char *input_file) {
     }
   }
 
+  std::cerr << "Eigenfaces read" << "\n";
+
   mis.read((char*)&_grouping, sizeof(int)); // grouping
   mis.read((char*)&_nGroups, sizeof(int)); // subjects
 
@@ -301,6 +437,14 @@ void efj::Database::read(const char *input_file) {
       _clustersProjection(i, j) = val;
     }
   }
+
+  std::cerr << "Clusters read" << "\n";
+
+  mis.read((char*)&_topEigenValues, sizeof(int));
+
+  std::cout << _topEigenValues;
+
+  std::cerr << "Top eigenvalues read" << "\n";
 
   mis.close();
 
@@ -341,7 +485,7 @@ void efj::Database::debug_print_centeredPixels() {
 
 void efj::Database::debug_print_eigenvectors(eigenvalue_type &eigenValues,
                                              eigenvectors_type &eigenVectors) {
-#if 1
+#if DEBUG
   std::cout << "Eigenvalues:" << std::endl;
   std::cout << eigenValues;
   std::cout << "Eigenvectors:" << std::endl;
