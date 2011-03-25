@@ -19,7 +19,7 @@
 namespace bf = boost::filesystem;
 
 /**
- * in this directory, seach for file with given extension
+ * in this directory, search for file with given extension
  * place paths in vector
  */
 void find_files(const bf::path & dir_path, const std::string & extension,
@@ -40,17 +40,19 @@ void find_files(const bf::path & dir_path, const std::string & extension,
 
 //finds minimum value of the vector returning its index
 int find_min(Eigen::VectorXd &vec){
-	int min = vec[0];
-	std::cout << min << std::endl;
+	double min = vec[0];
+	//std::cout << min << std::endl;
 	int index = 0;
 	for(int i = 1; i < vec.size() ; i++){
-		std::cout << min << std::endl;
-		std::cout << vec[i] << std::endl;
+		//std::cout << i << std::endl;
+		//std::cout << min << std::endl;
+		//std::cout << vec[i] << std::endl;
 		if(vec[i] < min){
+			std::cout << "Index:" << i << "is MIN!!" << std::endl;
 			min = vec[i];
 			index = i;
 		}
-		std::cout << index << std::endl;
+		//std::cout << index << std::endl;
 	}
 	return index;
 }
@@ -59,7 +61,7 @@ int main(int argc, char *argv[]) {
 
 #if 0
 	Eigen::VectorXd teste(8);
-	teste << 10,20,3,4,5,6,31,20;
+	teste << 100000,200000000,300000000000000,40000000000000,50000000,6000,3100000000,20000;
 
 	std::cout << "MinIndex: " << find_min(teste) << "   " << teste(find_min(teste));
 
@@ -67,7 +69,7 @@ int main(int argc, char *argv[]) {
 
 	std::string databaseDir;
 	std::string testDir;
-
+//#if 0
 	if (argc == 3) {
 		databaseDir = argv[1];
 		testDir = argv[2];
@@ -83,7 +85,7 @@ int main(int argc, char *argv[]) {
 	//const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/MyTrainDatabase";
 	std::vector<QString> files;
 
-	find_files(testDir, ".jpg", files);
+	find_files(testDir, ".pgm", files);
 	std::sort(files.begin(), files.end());
 
 	//load the matrix
@@ -91,22 +93,29 @@ int main(int argc, char *argv[]) {
 	//efjdb.read("/ofs/tmp/david/batata.dat");
 	efjdb.read(databaseDir);
 
-	int grouping = efjdb.get_grouping();
-	int nGroups = efjdb.get_nGroups();
+	int grouping = 22;
+	int nGroups = efjdb.get_nGroups()-1;
+
+	std::cerr << "Gouping: " << grouping << std::endl;
+	std::cerr << "nGroups: " << nGroups << std::endl;
 
 	int certas = 0;
 	int erradas = 0;
 
+	std::cout << "Files size: " << (int)files.size() << std::endl;
 	int aux = 0;
 
-	for(int i = 0 , subject = 0; i < (int)files.size() && subject < nGroups ; i++ , aux++) {
+	for(int i = 0 , subject = 0; i < (int)files.size() && subject <= nGroups ; i++ , aux++) {
 
 
 		//std::cerr << "Test image path:" << std::endl;
 		//std::string testImgPath;
 		//std::cin >> testImgPath;
 
+
+
 		if(aux == grouping){
+			std::cout << "Subject: " << subject << "  aux: " << aux << "  image: " << i << std::endl;
 			subject++;
 			aux = 0;
 		}
@@ -120,6 +129,8 @@ int main(int argc, char *argv[]) {
 		Eigen::VectorXd distances;
 		efjdb.compute_distance_to_groups(projection, distances);
 
+		std::cout << distances << std::endl;
+		//std::cout << find_min(distances) << std::endl;
 
 		if(find_min(distances) == subject){
 			certas++;
@@ -142,7 +153,7 @@ int main(int argc, char *argv[]) {
 
 	std::cout << "Certas: " << certas << std::endl;
 	std::cout << "Erradas: " << erradas << std::endl;
-
+//#endif
 #if 0
   for (int i = 0; i < 500; i++) {
     //std::cout << files[i];
