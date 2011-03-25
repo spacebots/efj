@@ -5,7 +5,7 @@
 #include <string>
 #include <boost/filesystem.hpp>
 #include <Eigen/Core>
-#include <Eigen/QR>
+#include <Eigen/Eigenvalues>
 #include <QString>
 
 #include "misc.h"

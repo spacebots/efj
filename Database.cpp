@@ -5,9 +5,6 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 #include <Eigen/Core>
-#include <Eigen/QR> //Non-Stable part of Eigen API
-//#include <Eigen/Geometry>
-//#include <Eigen/LU>
 #include <QImage>
 #include <QString>
 
