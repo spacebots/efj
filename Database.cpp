@@ -171,7 +171,7 @@ void efj::Database::compute_eigenfaces() {
 void efj::Database::project_clusters() {
   std::cerr << "Projecting Training Images" << std::endl;
 
-  _clustersProjection.resize(_nImages, _nGroups);
+  _clustersProjection.resize(_topEigenValues, _nGroups);
 
   Eigen::VectorXd trainingFaceEqualized(_features);
   for (int image = 0, group = 0; group < _nGroups; group++) {
@@ -188,7 +188,12 @@ void efj::Database::project_clusters() {
       double a = _eigenfaces.col(i).dot(trainingFaceEqualized);
       _clustersProjection(i, group) = a;
     }
+
   }
+  std::cerr << "Projecting Training Images - STARTING" << std::endl;
+  Eigen::MatrixXd batata = _clustersProjection;
+
+  std::cerr << batata.transpose() << std::endl;
   std::cerr << "Projecting Training Images - DONE" << std::endl;
 }
 
@@ -199,7 +204,8 @@ void efj::Database::project_single_image(Eigen::VectorXi &image, Eigen::VectorXd
   Eigen::VectorXd imageEqualized(_features);
 #pragma omp parallel for
   for (int i = 0; i < imageEqualized.size(); i++) {
-    imageEqualized(i) = std::abs(image(i) - _mean(i));
+    //imageEqualized(i) = std::abs(image(i) - _mean(i));
+    imageEqualized(i) = image(i) - _mean(i);
   }
 
   projection.resize(_topEigenValues);
@@ -288,8 +294,8 @@ void efj::Database::compute_distance_to_groups(Eigen::VectorXd &projection, Eige
 #endif
 
 //"usefullVectors" will be resized to _topEigenValues
-void efj::Database::filter_eigenVectors(Eigen::MatrixXd &usefullVectors, eigenvalue_type &eigenValues,
-    										 eigenvectors_type &eigenVectors, int _topEigenValues,
+void efj::Database::filter_eigenVectors(Eigen::MatrixXd &usefulVectors, eigenvalue_type &eigenValues,
+    										 eigenvectors_type &eigenVectors,
     										 std::vector< std::pair<double,int> > &selectedEigenValues){
 
 	if(_topEigenValues == 0){
@@ -297,7 +303,7 @@ void efj::Database::filter_eigenVectors(Eigen::MatrixXd &usefullVectors, eigenva
 	}
 
 	int eigenVectorsRows = eigenVectors.rows();
-	usefullVectors.resize(eigenVectorsRows , _topEigenValues);
+	usefulVectors.resize(eigenVectorsRows , _topEigenValues);
 
 	//std::cout << eigenVectors.rows();
 
@@ -321,7 +327,7 @@ void efj::Database::filter_eigenVectors(Eigen::MatrixXd &usefullVectors, eigenva
   for (int i = 0; i < _topEigenValues; i++) {//i = col
 #pragma omp parallel for
     for (int j = 0; j < eigenVectorsRows; j++) { // j = row
-    	usefullVectors(j,i) = eigenVectors(j, selectedEigenValues.back().second).real();
+    	usefulVectors(j,i) = eigenVectors(j, selectedEigenValues.back().second).real();
     }
     selectedEigenValues.pop_back();
   }
