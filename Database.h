@@ -65,7 +65,7 @@ namespace efj {
     void compute_distance_to_groups(Eigen::VectorXd &projection, Eigen::VectorXd &distances);
 
     void filter_eigenVectors(Eigen::MatrixXd &usefullVectors, eigenvalue_type &eigenValues,
-    							eigenvectors_type &eigenVectors, int _topEigenValues,
+    							eigenvectors_type &eigenVectors,
     							std::vector< std::pair<double,int> > &selectedEigenValues);
 
     void debug_print_pixels();
