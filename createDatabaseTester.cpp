@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
   //efjdb.read("/ofs/tmp/david/batata.dat");
   efjdb.read(databaseDir);
 
-  int grouping = 22;
+  int grouping = 2;
   int nGroups = efjdb.get_nGroups() - 1;
 
   std::cerr << "Gouping: " << grouping << std::endl;

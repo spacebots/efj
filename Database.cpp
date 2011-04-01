@@ -127,8 +127,9 @@ void efj::Database::compute_eigenfaces() {
 
   std::vector<std::pair<double, int> > selectedEigenValues;
 
-  filter_eigenVectors(usefulVectors, eigenValues, eigenVectors, selectedEigenValues);
-
+  initialize(_eigenfaces);
+  //filter_eigenVectors(usefulVectors, eigenValues, eigenVectors, selectedEigenValues);
+/*
   if (_topEigenValues > 0) {
 
     _eigenfaces.resize(_features, _topEigenValues);
@@ -148,7 +149,7 @@ void efj::Database::compute_eigenfaces() {
       }
     }
   } else if (_topEigenValues == 0) {
-
+*/
 #pragma omp parallel for
     for (int i = 0; i < _nImages; i++) {//i = col
 #pragma omp parallel for
@@ -156,14 +157,15 @@ void efj::Database::compute_eigenfaces() {
         _eigenfaces.col(i) += _centeredPixels.col(j) * eigenVectors(j, i).real();
       }
     }
-
+/*
   } else {
     std::cerr << "UNKNOWN ERROR AT COMPUTE_EIGENFACES" << std::endl;
   }
-
+*/
   std::cerr << "all done" << std::endl;
 }
 
+#if 0
 void efj::Database::project_clusters() {
   std::cerr << "Projecting Training Images" << std::endl;
 
@@ -228,8 +230,9 @@ void efj::Database::compute_distance_to_groups(Eigen::VectorXd &projection,
   }
 
 }
+#endif
 
-#if 0
+
 void efj::Database::project_clusters() {
   std::cerr << "Projecting Training Images" << std::endl;
 
@@ -286,7 +289,7 @@ void efj::Database::compute_distance_to_groups(Eigen::VectorXd &projection, Eige
   }
 
 }
-#endif
+
 
 //"usefullVectors" will be resized to _topEigenValues
 void efj::Database::filter_eigenVectors(Eigen::MatrixXd &usefulVectors,
