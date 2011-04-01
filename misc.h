@@ -34,19 +34,4 @@ namespace efj {
   }
 } // namespace efj
 
-namespace efj {
-  inline void readSingleFile(std::string pathToFile, Eigen::VectorXi &testImg) {
-    QImage img((QString)pathToFile.c_str());
-    testImg.resize((int)(img.height() * (int)(img.width())));
-#pragma omp parallel for
-    for (int rx = 0; rx < img.height(); rx++) {
-      int offset = rx * img.width();
-#pragma omp parallel for
-      for (int cx = 0; cx < img.width(); cx++) {
-        testImg[offset + cx] = qGray(img.pixel(cx, rx));
-      }
-    }
-  }
-} // namespace efj
-
 #endif

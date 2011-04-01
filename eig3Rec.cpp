@@ -3,29 +3,26 @@
 
 int main(int argc, char *argv[]) {
 
-	std::string readDir;
+	std::string database;
 
 	if (argc == 2) {
-		readDir = argv[1];
+		database = argv[1];
 	}
 	else {
-		std::cerr << "Usage: " << argv[0] << "  read_database_directory" << std::endl;
+		std::cerr << "Usage: " << argv[0] << "  database" << std::endl;
 		exit(1);
 	}
 
-	//"/ofs/tmp/eigDataBase1.dat"
-
 	efj::Database efjdb;
-	efjdb.read(readDir);
-	//efjdb.read("ofs/tmp/eigDataBaseYaleBExtendedCroped.dat");
+	efjdb.read(database);
 
   while (true) {
     std::cerr << "Test image path:" << std::endl;
     std::string testImgPath;
     std::cin >> testImgPath;
 
-    Eigen::VectorXi testImg;
-    efj::readSingleFile(testImgPath, testImg);
+    Eigen::VectorXd testImg;
+    efj::Database::readSingleFile(testImgPath.c_str(), testImg);
 
     Eigen::VectorXd projection;
     efjdb.project_single_image(testImg, projection);
@@ -39,7 +36,7 @@ int main(int argc, char *argv[]) {
     Eigen::VectorXd distances;
     efjdb.compute_distance_to_groups(projection, distances);
 
-    std::cerr << distances;
+    std::cerr << distances << std::endl;
     std::cerr << "Done" << std::endl;
   }
 

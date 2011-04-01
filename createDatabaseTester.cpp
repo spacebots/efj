@@ -66,15 +66,14 @@ int main(int argc, char *argv[]) {
 
 #endif
 
-  std::string databaseDir;
+  std::string database;
   std::string testDir;
   //#if 0
   if (argc == 3) {
-    databaseDir = argv[1];
+    database = argv[1];
     testDir = argv[2];
   } else {
-    std::cerr << "Usage: " << argv[0] << "  read_database_directory  read_test_directory"
-        << std::endl;
+    std::cerr << "Usage: " << argv[0] << " database test_directory" << std::endl;
     exit(1);
   }
 
@@ -82,19 +81,16 @@ int main(int argc, char *argv[]) {
   //const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/ImageVault/test";
   //const std::string dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/MyTrainDatabase";
   std::vector<QString> files;
-
   find_files(testDir, ".pgm", files);
   std::sort(files.begin(), files.end());
 
-  //load the matrix
   efj::Database efjdb;
-  //efjdb.read("/ofs/tmp/david/batata.dat");
-  efjdb.read(databaseDir);
+  efjdb.read(database);
 
-  int grouping = 2;
+  int nSubjects = 2;
   int nGroups = efjdb.get_nGroups() - 1;
 
-  std::cerr << "Gouping: " << grouping << std::endl;
+  std::cerr << "Gouping: " << nSubjects << std::endl;
   std::cerr << "nGroups: " << nGroups << std::endl;
 
   int certas = 0;
@@ -110,14 +106,14 @@ int main(int argc, char *argv[]) {
     //std::cin >> testImgPath;
 
 
-    if (aux == grouping) {
+    if (aux == nSubjects) {
       std::cout << "Subject: " << subject << "  aux: " << aux << "  image: " << i << std::endl;
       subject++;
       aux = 0;
     }
 
-    Eigen::VectorXi testImg;
-    efj::readSingleFile(files[i].toStdString(), testImg);
+    Eigen::VectorXd testImg;
+    efj::Database::readSingleFile(files[i], testImg);
 
     Eigen::VectorXd projection;
     efjdb.project_single_image(testImg, projection);
@@ -133,10 +129,6 @@ int main(int argc, char *argv[]) {
     } else {
       erradas++;
     }
-
-    //std::cerr << distances;
-    //std::cerr << "Done" << std::endl;
-
 
   }
 

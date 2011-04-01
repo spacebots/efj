@@ -3,25 +3,20 @@
 
 int main(int argc, char *argv[]) {
   std::string dir;
-  std::string saveDir;
-  int grouping = 1;
-  int topEigenValues = 0;
+  std::string database;
+  int nSubjects = 1;
 
-  ///ofs/tmp/eigDataBase1.dat
-
-  if (argc == 5) {
-    dir = argv[3];
-    saveDir = argv[4];
-    grouping = strtol(argv[1], NULL, 10);
-    topEigenValues = strtol(argv[2], NULL, 10);
+  if (argc == 4) {
+    dir = argv[2];
+    database = argv[3];
+    nSubjects = strtol(argv[1], NULL, 10);
   } else {
-    std::cerr << "Usage: " << argv[0] << " grouping topEigenValues directory_name save_database_directory" << std::endl;
+    std::cerr << "Usage: " << argv[0] << " images_per_subject directory_name database_name" << std::endl;
     exit(1);
   }
 
-  efj::Database db(dir, grouping, topEigenValues);
+  efj::Database db(dir, nSubjects);
   db.compute_eigenfaces();
   db.project_clusters();
-  db.write(saveDir);
-  //db.write("ofs/tmp/eigDataBaseYaleBExtendedCroped.dat");
+  db.write(database);
 }

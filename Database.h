@@ -23,31 +23,32 @@ namespace efj {
   private:
     // this matrix may become so large it won't fit in the stack
     // so, we allocate it on the heap
-    Eigen::MatrixXi _pixels; // M*N x P
+    Eigen::MatrixXd _pixels; // M*N x P
 
     int _nImages; // typically, _pixels->cols()
-    int _features; // typically, _pixels->rows()
+    int _nPixels; // typically, _pixels->rows()
 
-    int _grouping;  // how many faces per subject
-    int _nGroups;   // number of subjects
+    int _facesPerSubject; // how many faces per subject
+    int _nSubjects; // number of subjects
 
-    int _topEigenValues; //top n most significative eigenValues
-
-    Eigen::VectorXd _mean;
-    Eigen::MatrixXd _centeredPixels; //[M*N x P] - [mean] ///usar new
+    Eigen::VectorXd _mean; // uppercase psi
+    Eigen::MatrixXd _centeredPixels; //[M*N x P] - [mean]
     Eigen::MatrixXd _centeredPixelsFiltered;
 
     Eigen::MatrixXd _eigenfaces;
+    int _nEigenFaces; //top n most significative eigenValues
+
     Eigen::MatrixXd _clustersProjection;
 
   public:
 
     // empty database: should use "read" to fill up data.
-    inline Database() {}
+    inline Database() {
+    }
 
     //dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/MyTrainDatabase"
     //dir = "/afs/l2f.inesc-id.pt/home/ferreira/FaceRec/ImageVault/train";
-    Database(const std::string &dir, int grouping, int topEigenValues);
+    Database(const std::string &dir, int facesPerSubject);
 
     /**
      * in this directory, seach for file with given extension
@@ -61,30 +62,31 @@ namespace efj {
     void compute_eigenfaces();
 
     void project_clusters();
-    void project_single_image(Eigen::VectorXi &image, Eigen::VectorXd &projection);
+    void project_single_image(Eigen::VectorXd &image, Eigen::VectorXd &projection);
     void compute_distance_to_groups(Eigen::VectorXd &projection, Eigen::VectorXd &distances);
-
-    void filter_eigenVectors(Eigen::MatrixXd &usefullVectors, eigenvalue_type &eigenValues,
-    							eigenvectors_type &eigenVectors,
-    							std::vector< std::pair<double,int> > &selectedEigenValues);
 
     void debug_print_pixels();
     void debug_print_mean();
     void debug_print_centeredPixels();
-    void debug_print_eigenvectors(eigenvalue_type &eigenValues, eigenvectors_type &eigenVectors);
-    void debug_print_covariance_matrix(Eigen::MatrixXd &covMatrix);
+    void debug_print_eigenvectors(const eigenvalue_type &eigenValues,
+                                  const eigenvectors_type &eigenVectors);
+    void debug_print_covariance_matrix(const Eigen::MatrixXd &covMatrix);
 
     void read(std::string input_file);
     void write(std::string output_file);
 
-    int get_nGroups(){
-    	return _nGroups;
+    int get_nGroups() {
+      return _nSubjects;
     }
 
-    int get_grouping(){
-        return _grouping;
+    int get_grouping() {
+      return _facesPerSubject;
     }
 
+    static void readSingleFile(QString imageFileName, Eigen::VectorXd &pixels);
+
+  protected:
+    void filter_eigenvectors(const eigenvalue_type &eigenvalues, const eigenvectors_type &eigenvectors);
 
   };
 
