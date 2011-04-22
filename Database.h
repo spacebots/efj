@@ -33,7 +33,6 @@ namespace efj {
 
     Eigen::VectorXd _mean; // uppercase psi
     Eigen::MatrixXd _centeredPixels; //[M*N x P] - [mean]
-    Eigen::MatrixXd _centeredPixelsFiltered;
 
     Eigen::MatrixXd _eigenfaces;
     int _nEigenFaces; //top n most significative eigenValues
@@ -77,10 +76,6 @@ namespace efj {
 
     int get_nGroups() {
       return _nSubjects;
-    }
-
-    int get_grouping() {
-      return _facesPerSubject;
     }
 
     static void readSingleFile(QString imageFileName, Eigen::VectorXd &pixels);
