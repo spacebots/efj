@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
     }
 
     Eigen::VectorXd testImg;
-    efj::Database::readSingleFile(files[i], testImg);
+    efjdb.readSingleFile(files[i], testImg);
 
     Eigen::VectorXd projection;
     efjdb.project_single_image(testImg, projection);

@@ -12,16 +12,16 @@
 
 namespace bf = boost::filesystem;
 
-void efj::Database::readSingleFile(QString pathToFile, Eigen::VectorXd &testImg) {
-  QImage img(pathToFile);
-  testImg.resize((int)(img.height() * (int)(img.width())));
+void efj::Database::readSingleFile(QString imgFile, Eigen::VectorXd &imgVector) {
+  QImage img(imgFile);
+  imgVector.resize((int)(img.height() * (int)(img.width())));
 #pragma omp parallel for
   for (int rx = 0; rx < img.height(); rx++) {
     int offset = rx * img.width();
 #pragma omp parallel for
     for (int cx = 0; cx < img.width(); cx++) {
-      //DAVID testImg[offset + cx] = img.pixel(cx, rx);
-      testImg[offset + cx] = qGray(img.pixel(cx, rx));
+      //DAVID imgVector[offset + cx] = img.pixel(cx, rx);
+      imgVector[offset + cx] = qGray(img.pixel(cx, rx));
     }
   }
 }

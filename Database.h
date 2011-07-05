@@ -63,6 +63,10 @@ namespace efj {
     void project_clusters();
     void project_single_image(Eigen::VectorXd &image, Eigen::VectorXd &projection);
     void compute_distance_to_groups(Eigen::VectorXd &projection, Eigen::VectorXd &distances);
+    void compute_distance_to_groups(Eigen::VectorXd &projection, Eigen::VectorXd &distances, Eigen::VectorXd &results);
+
+    bool compute_single_match_with_confidence(Eigen::VectorXd &projection, Eigen::VectorXd &distances,
+                                                  int &result, double &confidence);
 
     void debug_print_pixels();
     void debug_print_mean();
@@ -78,7 +82,7 @@ namespace efj {
       return _nSubjects;
     }
 
-    static void readSingleFile(QString imageFileName, Eigen::VectorXd &pixels);
+    void readSingleFile(QString imageFileName, Eigen::VectorXd &pixels);
 
   protected:
     void filter_eigenvectors(const eigenvalue_type &eigenvalues, const eigenvectors_type &eigenvectors);

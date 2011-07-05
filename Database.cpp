@@ -68,6 +68,8 @@ inline int operator<(std::complex<double> &c1, std::complex<double> &c2) {
   return c1.real() < c2.real();
 }
 
+//#define EIGENVALUES_RATIO 1e-3
+#define EIGENVALUES_RATIO 0  /* use all eigenvectors */
 void efj::Database::filter_eigenvectors(const eigenvalue_type &eigenvalues,
                                         const eigenvectors_type &eigenvectors) {
 
@@ -81,7 +83,7 @@ void efj::Database::filter_eigenvectors(const eigenvalue_type &eigenvalues,
 
   std::vector<int> eigenvalues_indexvector;
   for (int i = 0; i < eigenvalues.size(); i++) {
-    if (eigenvalues(i).real() / maxev > 1e-3) {
+    if (eigenvalues(i).real() / maxev > EIGENVALUES_RATIO) {
       eigenvalues_indexvector.push_back(i);
       _nEigenFaces++;
     }
@@ -90,13 +92,18 @@ void efj::Database::filter_eigenvectors(const eigenvalue_type &eigenvalues,
   _eigenfaces.resize(_nPixels, _nEigenFaces);
   initialize(_eigenfaces);
 
-//#pragma omp parallel for
+  //#pragma omp parallel for
   for (int eigenface = 0; eigenface < _nEigenFaces; eigenface++) {
-//#pragma omp parallel for
+    //#pragma omp parallel for
     for (int image = 0; image < _nImages; image++) {
       _eigenfaces.col(eigenface) += _centeredPixels.col(image)
           * eigenvectors(image, eigenvalues_indexvector[eigenface]).real();
     }
+
+    std::cout << "********** EIGENFACE " << eigenface << std::endl;
+    std::cout << "P2 172 244 255" << std::endl;
+    std::cout << _eigenfaces.col(eigenface) << std::endl;
+    std::cout << "********** EIGENFACE " << eigenface << " (END)" << std::endl;
 
   }
 
@@ -116,7 +123,6 @@ void efj::Database::project_clusters() {
       meanFace += _pixels.col(i);
     }
     meanFace /= _facesPerSubject; //this gives the mean of images from the same group
-    meanFace -= _mean;
 
     //project it to the eigenfaces space
     Eigen::VectorXd projection;
@@ -148,3 +154,74 @@ void efj::Database::compute_distance_to_groups(Eigen::VectorXd &projection,
     distances(subject) = aux.norm();
   }
 }
+
+// "distances" will be resized to _nGroups
+void efj::Database::compute_distance_to_groups(Eigen::VectorXd &projection,
+                                               Eigen::VectorXd &distances, Eigen::VectorXd &results) {
+  std::cerr << "Calculating Distances" << std::endl;
+  distances.resize(_nSubjects);
+  double average = 0;
+  for (int subject = 0; subject < _nSubjects; subject++) {
+    Eigen::VectorXd aux = projection - _clustersProjection.col(subject);
+    distances(subject) = aux.norm();
+    average += aux.norm();
+  }
+  average /= _nSubjects;
+
+  results.resize(_nSubjects);
+  for (int subject = 0; subject < _nSubjects; subject++) {
+    if (distances(subject) > average)
+      results(subject) = 0.0;
+    else {
+      double rate = std::abs(average - distances(subject)) / average;
+      if (rate < 0.5)
+        results(subject) = 0.0;
+      else {
+        if (rate > 0.95)
+          results(subject) = 1.0;
+        else
+          results(subject) = rate;
+      }
+    }
+  }
+
+}
+
+// "distances" will be resized to _nGroups
+bool efj::Database::compute_single_match_with_confidence(Eigen::VectorXd &projection, Eigen::VectorXd &distances,
+                                                  int &result, double &confidence) {
+  std::cerr << "Calculating Distances" << std::endl;
+  distances.resize(_nSubjects);
+  double average = 0;
+  double minimum = std::numeric_limits<double>::max();
+  result = 0;
+  for (int subject = 0; subject < _nSubjects; subject++) {
+    Eigen::VectorXd aux = projection - _clustersProjection.col(subject);
+    double norm = aux.norm();
+    distances(subject) = norm;
+    if (norm < minimum) { minimum = norm; result = subject; }
+    average += aux.norm();
+  }
+  average /= _nSubjects;
+
+  if (distances(result) > average) {
+    confidence = 1.0;
+    return false;
+  }
+  else {
+    double rate = std::abs(average - distances(result)) / average;
+    if (rate < 0.5 || rate < confidence) {
+      confidence = rate;
+      return false;
+    }
+    else {
+      if (rate > 0.95)
+        confidence = 1.0;
+      else
+        confidence = rate;
+      return true;
+    }
+  }
+
+}
+

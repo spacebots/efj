@@ -4,3 +4,5 @@ eig3Train
 .makedeps
 *.dat
 *.out
+eig3RecOne
+eig3RecOnePickOne
