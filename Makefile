@@ -6,7 +6,7 @@ QTDIR=/usr/lib64/qt4
 EIGEN=/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/eigen
 
 CLASSES = Database Database_io Database_debug
-PROGRAMS = eig3Train eig3Rec eig3RecOne eig3RecOnePickOne createDatabaseTester
+PROGRAMS = 
 
 SRCFILES = $(CLASSES:%=%.cpp) $(PROGRAMS:%=%.cpp)
 OCLASSES = $(CLASSES:%=%.o)
