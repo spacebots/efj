@@ -45,9 +45,17 @@ namespace efj {
     inline Database() {
     }
 
-    //dir = "/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/MyTrainDatabase"
-    //dir = "/afs/l2f.inesc-id.pt/home/ferreira/FaceRec/ImageVault/train";
+    /**
+     * Constructor for training.
+     */
     Database(const std::string &dir, int facesPerSubject);
+
+    /**
+     * Constructor for recognizing.
+     */
+    inline Database(const std::string &database) {
+      read(database);
+    }
 
     /**
      * in this directory, seach for file with given extension
@@ -61,12 +69,23 @@ namespace efj {
     void compute_eigenfaces();
 
     void project_clusters();
-    void project_single_image(Eigen::VectorXd &image, Eigen::VectorXd &projection);
+    void project_single_image(Eigen::VectorXd &image, Eigen::VectorXd &projection) const;
     void compute_distance_to_groups(Eigen::VectorXd &projection, Eigen::VectorXd &distances);
-    void compute_distance_to_groups(Eigen::VectorXd &projection, Eigen::VectorXd &distances, Eigen::VectorXd &results);
+    void compute_distance_to_groups(Eigen::VectorXd &projection, Eigen::VectorXd &distances,
+                                    Eigen::VectorXd &results);
 
-    bool compute_single_match_with_confidence(Eigen::VectorXd &projection, Eigen::VectorXd &distances,
-                                                  int &result, double &confidence);
+    bool compute_single_match_with_confidence(Eigen::VectorXd &projection,
+                                              Eigen::VectorXd &distances, int &result,
+                                              double &confidence) const;
+
+    bool id(Eigen::VectorXd &image, double confidence, int &result) const {
+      Eigen::VectorXd projection, distances;
+      project_single_image(image, projection);
+      bool recognized = compute_single_match_with_confidence(projection, distances, result,
+                                                             confidence);
+      std::cout << "** DISTANCES: " << distances << "\n";
+      return recognized;
+    }
 
     void debug_print_pixels();
     void debug_print_mean();
@@ -85,7 +104,8 @@ namespace efj {
     void readSingleFile(QString imageFileName, Eigen::VectorXd &pixels);
 
   protected:
-    void filter_eigenvectors(const eigenvalue_type &eigenvalues, const eigenvectors_type &eigenvectors);
+    void filter_eigenvectors(const eigenvalue_type &eigenvalues,
+                             const eigenvectors_type &eigenvectors);
 
   };
 

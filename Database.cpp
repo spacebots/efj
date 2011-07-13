@@ -132,7 +132,7 @@ void efj::Database::project_clusters() {
 }
 
 // "projection" will be resized to _nImages
-void efj::Database::project_single_image(Eigen::VectorXd &image, Eigen::VectorXd &projection) {
+void efj::Database::project_single_image(Eigen::VectorXd &image, Eigen::VectorXd &projection) const {
   std::cerr << "Projecting Test Image" << std::endl;
   Eigen::VectorXd imageEqualized(_nPixels);
   imageEqualized = image - _mean;
@@ -189,7 +189,7 @@ void efj::Database::compute_distance_to_groups(Eigen::VectorXd &projection,
 
 // "distances" will be resized to _nGroups
 bool efj::Database::compute_single_match_with_confidence(Eigen::VectorXd &projection, Eigen::VectorXd &distances,
-                                                  int &result, double &confidence) {
+                                                  int &result, double &confidence) const {
   std::cerr << "Calculating Distances" << std::endl;
   distances.resize(_nSubjects);
   double average = 0;
