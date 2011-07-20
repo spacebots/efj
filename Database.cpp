@@ -68,8 +68,8 @@ inline int operator<(std::complex<double> &c1, std::complex<double> &c2) {
   return c1.real() < c2.real();
 }
 
-//#define EIGENVALUES_RATIO 1e-3
-#define EIGENVALUES_RATIO 0  /* use all eigenvectors */
+#define EIGENVALUES_RATIO 1e-2
+//#define EIGENVALUES_RATIO 0  /* use all eigenvectors */
 void efj::Database::filter_eigenvectors(const eigenvalue_type &eigenvalues,
                                         const eigenvectors_type &eigenvectors) {
 
@@ -101,9 +101,24 @@ void efj::Database::filter_eigenvectors(const eigenvalue_type &eigenvalues,
     }
 
     std::cout << "********** EIGENFACE " << eigenface << std::endl;
-    std::cout << "P2 172 244 255" << std::endl;
+    //DAVID std::cout << "P2 172 244 255" << std::endl; // first tests
+    std::cout << "P2 72 72 255" << std::endl; // camera
     std::cout << _eigenfaces.col(eigenface) << std::endl;
     std::cout << "********** EIGENFACE " << eigenface << " (END)" << std::endl;
+
+    std::stringstream oefs;
+    oefs << "efj-auto-eigenface-" << eigenface << ".pnm";
+    std::ofstream oef(oefs.str().c_str());
+    oef << "P2 " << sqrt(_eigenfaces.rows()) << " " << sqrt(_eigenfaces.rows()) << " 255"
+        << std::endl; // camera
+    Eigen::VectorXd pixels = _eigenfaces.col(eigenface);
+    for (int px = 0; px < pixels.size(); px++)
+      pixels(px) = std::abs(pixels(px));
+    double efmax = pixels.maxCoeff();
+    pixels *= 255.0 / efmax;
+    for (int px = 0; px < pixels.size(); px++)
+      oef << (int)pixels(px) << std::endl;
+    oef.close();
 
   }
 
@@ -188,8 +203,9 @@ void efj::Database::compute_distance_to_groups(Eigen::VectorXd &projection,
 }
 
 // "distances" will be resized to _nGroups
-bool efj::Database::compute_single_match_with_confidence(Eigen::VectorXd &projection, Eigen::VectorXd &distances,
-                                                  int &result, double &confidence) const {
+bool efj::Database::compute_single_match_with_confidence(Eigen::VectorXd &projection,
+                                                         Eigen::VectorXd &distances, int &result,
+                                                         double &confidence) const {
   std::cerr << "Calculating Distances" << std::endl;
   distances.resize(_nSubjects);
   double average = 0;
@@ -199,7 +215,10 @@ bool efj::Database::compute_single_match_with_confidence(Eigen::VectorXd &projec
     Eigen::VectorXd aux = projection - _clustersProjection.col(subject);
     double norm = aux.norm();
     distances(subject) = norm;
-    if (norm < minimum) { minimum = norm; result = subject; }
+    if (norm < minimum) {
+      minimum = norm;
+      result = subject;
+    }
     average += aux.norm();
   }
   average /= _nSubjects;
@@ -207,14 +226,12 @@ bool efj::Database::compute_single_match_with_confidence(Eigen::VectorXd &projec
   if (distances(result) > average) {
     confidence = 1.0;
     return false;
-  }
-  else {
+  } else {
     double rate = std::abs(average - distances(result)) / average;
     if (rate < 0.5 || rate < confidence) {
       confidence = rate;
       return false;
-    }
-    else {
+    } else {
       if (rate > 0.95)
         confidence = 1.0;
       else

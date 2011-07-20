@@ -83,7 +83,7 @@ namespace efj {
       project_single_image(image, projection);
       bool recognized = compute_single_match_with_confidence(projection, distances, result,
                                                              confidence);
-      std::cout << "** DISTANCES: " << distances << "\n";
+      //DEBUG std::cout << "** DISTANCES: " << distances << "\n";
       return recognized;
     }
 
