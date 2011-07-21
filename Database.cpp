@@ -106,6 +106,8 @@ void efj::Database::filter_eigenvectors(const eigenvalue_type &eigenvalues,
     std::cout << _eigenfaces.col(eigenface) << std::endl;
     std::cout << "********** EIGENFACE " << eigenface << " (END)" << std::endl;
 
+    //DAVID: the following produces eigenfaces as images
+    //DAVID: note that values as normalized as grayscale
     std::stringstream oefs;
     oefs << "efj-auto-eigenface-" << eigenface << ".pnm";
     std::ofstream oef(oefs.str().c_str());
