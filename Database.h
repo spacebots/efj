@@ -1,5 +1,5 @@
-//$Id: Database.h,v 1.12 2011/07/22 14:32:44 ferreira Exp $
-
+// $Id: Database.h,v 1.13 2011/07/22 14:44:23 david Exp $
+//
 // Copyright (C) 2008-2011 INESC ID Lisboa.
 //
 // This program is free software; you can redistribute it and/or modify
@@ -16,10 +16,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
-
-//$Log: Database.h,v $
-//Revision 1.12  2011/07/22 14:32:44  ferreira
-//Added Copyright comment
+// $Log: Database.h,v $
+// Revision 1.13  2011/07/22 14:44:23  david
+// Minor cleanup.
+//
+// Revision 1.12  2011/07/22 14:32:44  ferreira
+// Added Copyright comment
 //
 
 #ifndef __EFJ_DATABASE_H__
