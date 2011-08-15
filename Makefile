@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.9 2011/07/22 14:44:23 david Exp $
+# $Id: Makefile,v 1.10 2011/08/15 16:36:14 david Exp $
 #
 # Copyright (C) 2008-2011 INESC ID Lisboa.
 #
@@ -17,54 +17,55 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # $Log: Makefile,v $
+# Revision 1.10  2011/08/15 16:36:14  david
+# Updated project files to be more compatible with building installation
+# packages.
+#
 # Revision 1.9  2011/07/22 14:44:23  david
 # Minor cleanup.
 #
 #
 
-CC = g++
-#32bit
-#QTDIR=/usr/lib/qt4
-#64bit
-QTDIR=/usr/lib64/qt4
-EIGEN=/afs/l2f.inesc-id.pt/home/ferreira/face-recognition/eigen
+CC = c++
+
+# default values (openSUSE 11.4, 64 bits)
+LIBDIR=/usr/lib64
+INCLUDEDIR=/usr/include
+
+QTDIR=$(LIBDIR)/qt4
+EIGEN=$(INCLUDEDIR)/eigen3
 
 CLASSES = Database Database_io Database_debug
-PROGRAMS = 
 
-SRCFILES = $(CLASSES:%=%.cpp) $(PROGRAMS:%=%.cpp)
+SRCFILES = $(CLASSES:%=%.cpp)
 OCLASSES = $(CLASSES:%=%.o)
-OFILES = $(PROGRAMS:%=%.o) $(OCLASSES)
+OFILES = $(OCLASSES)
 
-LIBEFJ = libefj.so
+LIBEFJ_SO = libefj.so
+LIBEFJ_A = libefj.a
 
-# 32bit
-#BASE_CXXFLAGS = -I$(EIGEN) -I$(QTDIR)/include/QtCore/ -I$(QTDIR)/include/QtGui -DPIC -fPIC -m32 -pipe 
-# 64bit
-BASE_CXXFLAGS = -I$(EIGEN) -I$(QTDIR)/include/QtCore/ -I$(QTDIR)/include/QtGui -DPIC -fPIC -m64 -pipe 
-# 32bit vanilla
-#CXXFLAGS = $(BASE_CXXFLAGS) -DNDEBUG -DEIGEN_NO_DEBUG -O3 -fmessage-length=0 -Wall -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -D_REENTRANT -fopenmp
-
+BASE_CXXFLAGS = -I. -I$(QTDIR)/include/QtCore/ -I$(QTDIR)/include/QtGui -I$(EIGEN) -DPIC -fPIC -pipe 
 # optimize
 #CXXFLAGS = $(BASE_CXXFLAGS) -DDEBUG -DNDEBUG -DEIGEN_NO_DEBUG -O3 -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2 -fmessage-length=0 -Wall -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -D_REENTRANT -fopenmp
 # debug
 CXXFLAGS = $(BASE_CXXFLAGS) -ggdb -Wall -DDEBUG -D_FORTIFY_SOURCE=2 -funwind-tables -fasynchronous-unwind-tables -D_REENTRANT
 
-LDFLAGS = -L. -lefj -lboost_filesystem -lQtGui -lgomp
+all: link $(LIBEFJ_SO) $(LIBEFJ_A)
 
-all: $(LIBEFJ) $(PROGRAMS)
+link:
+	-ln -s . efj
 
-$(LIBEFJ): $(OCLASSES)
+$(LIBEFJ_SO): $(OCLASSES)
 	$(CXX) -shared -o $@ $^
+
+$(LIBEFJ_A): $(OCLASSES)
+	$(AR) crv $@ $^
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-%: %.o
-	$(CXX) -o $@ $< $(LDFLAGS)
-
 clean: 
-	$(RM) $(PROGRAMS) $(OFILES) $(LIBEFJ)
+	$(RM) $(PROGRAMS) $(OFILES) $(LIBEFJ_SO) $(LIBEFJ_A)
 	
 depend:
 	$(CXX) $(CXXFLAGS) -MM $(SRCFILES) > .makedeps

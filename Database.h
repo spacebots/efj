@@ -1,4 +1,4 @@
-// $Id: Database.h,v 1.13 2011/07/22 14:44:23 david Exp $
+// $Id: Database.h,v 1.14 2011/08/15 16:36:14 david Exp $
 //
 // Copyright (C) 2008-2011 INESC ID Lisboa.
 //
@@ -17,6 +17,10 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 // $Log: Database.h,v $
+// Revision 1.14  2011/08/15 16:36:14  david
+// Updated project files to be more compatible with building installation
+// packages.
+//
 // Revision 1.13  2011/07/22 14:44:23  david
 // Minor cleanup.
 //
@@ -34,7 +38,7 @@
 #include <Eigen/Eigenvalues>
 #include <QString>
 
-#include "misc.h"
+#include <efj/misc.h>
 
 namespace bf = boost::filesystem;
 
