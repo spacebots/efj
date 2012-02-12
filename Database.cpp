@@ -1,4 +1,4 @@
-// $Id: Database.cpp,v 1.18 2011/08/15 16:36:15 david Exp $
+// $Id: Database.cpp,v 1.19 2012/02/12 02:05:23 ferreira Exp $
 //
 // Copyright (C) 2008-2011 INESC ID Lisboa.
 //
@@ -17,6 +17,9 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 // $Log: Database.cpp,v $
+// Revision 1.19  2012/02/12 02:05:23  ferreira
+// Added CSUFaceIDEvalSystem compatible output
+//
 // Revision 1.18  2011/08/15 16:36:15  david
 // Updated project files to be more compatible with building installation
 // packages.
@@ -88,6 +91,9 @@ void efj::Database::compute_eigenfaces() {
   debug_print_eigenvectors(eigenValues, eigenVectors);
   filter_eigenvectors(eigenValues, eigenVectors);
 
+  _eigenValues = eigenValues;		//atribute filling for CSU compliance
+  _eigenVectors = eigenVectors;		//atribute filling for CSU compliance
+
   std::cerr << "all done" << std::endl;
 }
 
@@ -98,8 +104,8 @@ inline int operator<(std::complex<double> &c1, std::complex<double> &c2) {
   return c1.real() < c2.real();
 }
 
-#define EIGENVALUES_RATIO 1e-2
-//#define EIGENVALUES_RATIO 0  /* use all eigenvectors */
+//#define EIGENVALUES_RATIO 1e-2
+#define EIGENVALUES_RATIO 0  /* use all eigenvectors */
 void efj::Database::filter_eigenvectors(const eigenvalue_type &eigenvalues,
                                         const eigenvectors_type &eigenvectors) {
 

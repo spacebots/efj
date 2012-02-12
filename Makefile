@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.10 2011/08/15 16:36:14 david Exp $
+# $Id: Makefile,v 1.11 2012/02/12 02:05:23 ferreira Exp $
 #
 # Copyright (C) 2008-2011 INESC ID Lisboa.
 #
@@ -17,6 +17,9 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # $Log: Makefile,v $
+# Revision 1.11  2012/02/12 02:05:23  ferreira
+# Added CSUFaceIDEvalSystem compatible output
+#
 # Revision 1.10  2011/08/15 16:36:14  david
 # Updated project files to be more compatible with building installation
 # packages.
@@ -48,7 +51,7 @@ BASE_CXXFLAGS = -I. -I$(QTDIR)/include/QtCore/ -I$(QTDIR)/include/QtGui -I$(EIGE
 # optimize
 #CXXFLAGS = $(BASE_CXXFLAGS) -DDEBUG -DNDEBUG -DEIGEN_NO_DEBUG -O3 -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2 -fmessage-length=0 -Wall -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -D_REENTRANT -fopenmp
 # debug
-CXXFLAGS = $(BASE_CXXFLAGS) -ggdb -Wall -DDEBUG -D_FORTIFY_SOURCE=2 -funwind-tables -fasynchronous-unwind-tables -D_REENTRANT
+CXXFLAGS = $(BASE_CXXFLAGS) -ggdb -Wall -DDEBUG -D_FORTIFY_SOURCE=2 -funwind-tables -fasynchronous-unwind-tables -D_REENTRANT -lQtCore -lQtGui -lgomp -lboost_system
 
 all: link $(LIBEFJ_SO) $(LIBEFJ_A)
 

@@ -1,4 +1,4 @@
-// $Id: Database.h,v 1.14 2011/08/15 16:36:14 david Exp $
+// $Id: Database.h,v 1.15 2012/02/12 02:05:23 ferreira Exp $
 //
 // Copyright (C) 2008-2011 INESC ID Lisboa.
 //
@@ -17,6 +17,9 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 // $Log: Database.h,v $
+// Revision 1.15  2012/02/12 02:05:23  ferreira
+// Added CSUFaceIDEvalSystem compatible output
+//
 // Revision 1.14  2011/08/15 16:36:14  david
 // Updated project files to be more compatible with building installation
 // packages.
@@ -31,11 +34,13 @@
 #ifndef __EFJ_DATABASE_H__
 #define __EFJ_DATABASE_H__
 
+#include <Eigen/Core>
+#include <Eigen/Eigenvalues>
+
 #include <vector>
 #include <string>
 #include <boost/filesystem.hpp>
-#include <Eigen/Core>
-#include <Eigen/Eigenvalues>
+
 #include <QString>
 
 #include <efj/misc.h>
@@ -66,6 +71,9 @@ namespace efj {
 
     Eigen::MatrixXd _eigenfaces;
     int _nEigenFaces; //top n most significative eigenValues
+
+    eigenvalue_type _eigenValues;		//needed for CSU compliance
+    eigenvectors_type _eigenVectors;	//needed for CSU compliance
 
     Eigen::MatrixXd _clustersProjection;
 
@@ -126,6 +134,9 @@ namespace efj {
 
     void read(std::string input_file);
     void write(std::string output_file);
+
+    void writeSubspace(std::string output_file);  //CSU compatible write
+
 
     int get_nGroups() {
       return _nSubjects;
