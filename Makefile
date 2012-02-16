@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.11 2012/02/12 02:05:23 ferreira Exp $
+# $Id: Makefile,v 1.12 2012/02/16 17:21:26 david Exp $
 #
 # Copyright (C) 2008-2011 INESC ID Lisboa.
 #
@@ -17,6 +17,9 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # $Log: Makefile,v $
+# Revision 1.12  2012/02/16 17:21:26  david
+# Correcção de alguns bugs (David + Jaime).
+#
 # Revision 1.11  2012/02/12 02:05:23  ferreira
 # Added CSUFaceIDEvalSystem compatible output
 #
@@ -38,7 +41,7 @@ INCLUDEDIR=/usr/include
 QTDIR=$(LIBDIR)/qt4
 EIGEN=$(INCLUDEDIR)/eigen3
 
-CLASSES = Database Database_io Database_debug
+CLASSES = Database Database_io Database_debug Database_csuOutput
 
 SRCFILES = $(CLASSES:%=%.cpp)
 OCLASSES = $(CLASSES:%=%.o)

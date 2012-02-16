@@ -1,4 +1,4 @@
-// $Id: Database_io.cpp,v 1.6 2011/08/15 16:36:15 david Exp $
+// $Id: Database_io.cpp,v 1.7 2012/02/16 17:21:27 david Exp $
 //
 // Copyright (C) 2008-2011 INESC ID Lisboa.
 //
@@ -17,6 +17,9 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 // $Log: Database_io.cpp,v $
+// Revision 1.7  2012/02/16 17:21:27  david
+// Correcção de alguns bugs (David + Jaime).
+//
 // Revision 1.6  2011/08/15 16:36:15  david
 // Updated project files to be more compatible with building installation
 // packages.
@@ -78,7 +81,7 @@ void efj::Database::find_files(const bf::path & dir_path, const std::string & ex
 //const std::string trainDatabasePath = "/afs/l2f.inesc-id.pt/home/ferreira/FaceRec/ImageVault/train";
 bool efj::Database::load_pixels(const std::string &trainDatabasePath) {
   std::vector<QString> files;
-  find_files(trainDatabasePath, ".png", files);
+  find_files(trainDatabasePath, ".pgm", files);
   std::sort(files.begin(), files.end());
 
   if (files.size() == 0)
