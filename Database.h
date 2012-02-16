@@ -1,4 +1,4 @@
-// $Id: Database.h,v 1.15 2012/02/12 02:05:23 ferreira Exp $
+// $Id: Database.h,v 1.16 2012/02/16 23:43:36 ferreira Exp $
 //
 // Copyright (C) 2008-2011 INESC ID Lisboa.
 //
@@ -17,6 +17,9 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 // $Log: Database.h,v $
+// Revision 1.16  2012/02/16 23:43:36  ferreira
+// added a new computeEigenfaces that does not filter the eigenvalues and eigenvectors
+//
 // Revision 1.15  2012/02/12 02:05:23  ferreira
 // Added CSUFaceIDEvalSystem compatible output
 //
@@ -105,6 +108,7 @@ namespace efj {
     bool load_pixels(const std::string &trainDatabasePath);
 
     void compute_eigenfaces();
+    void compute_eigenfaces_NO_FILTERING();
 
     void project_clusters();
     void project_single_image(Eigen::VectorXd &image, Eigen::VectorXd &projection) const;
