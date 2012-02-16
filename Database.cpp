@@ -1,4 +1,4 @@
-// $Id: Database.cpp,v 1.19 2012/02/12 02:05:23 ferreira Exp $
+// $Id: Database.cpp,v 1.20 2012/02/16 23:02:03 ferreira Exp $
 //
 // Copyright (C) 2008-2011 INESC ID Lisboa.
 //
@@ -17,6 +17,9 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 // $Log: Database.cpp,v $
+// Revision 1.20  2012/02/16 23:02:03  ferreira
+// *** empty log message ***
+//
 // Revision 1.19  2012/02/12 02:05:23  ferreira
 // Added CSUFaceIDEvalSystem compatible output
 //
@@ -46,7 +49,7 @@
 efj::Database::Database(const std::string &dir, int facesPerSubject) :
   _facesPerSubject(facesPerSubject) {
   load_pixels(dir);
-  debug_print_pixels();
+  //debug_print_pixels();
 
   _nImages = _pixels.cols();
   _nPixels = _pixels.rows(); //number of pixels, column size
@@ -63,7 +66,7 @@ efj::Database::Database(const std::string &dir, int facesPerSubject) :
     }
     _mean(i) = accumulated / _nImages;
   }
-  debug_print_mean();
+  //debug_print_mean();
 
   _centeredPixels.resize(_nPixels, _nImages);
 
@@ -77,18 +80,18 @@ efj::Database::Database(const std::string &dir, int facesPerSubject) :
   }
 
   std::cerr << "pixels centered\n";
-  debug_print_centeredPixels();
+  //debug_print_centeredPixels();
 }
 
 void efj::Database::compute_eigenfaces() {
   Eigen::MatrixXd covMatrix(_nImages, _nImages);
   covMatrix = _centeredPixels.transpose() * _centeredPixels; //[IxP]x[PxI]=[IxI]
-  debug_print_covariance_matrix(covMatrix);
+  //debug_print_covariance_matrix(covMatrix);
 
   Eigen::EigenSolver<Eigen::MatrixXd> *solver2 = new Eigen::EigenSolver<Eigen::MatrixXd>(covMatrix);
   const eigenvalue_type &eigenValues = solver2->eigenvalues();
   const eigenvectors_type &eigenVectors = solver2->eigenvectors();
-  debug_print_eigenvectors(eigenValues, eigenVectors);
+  //debug_print_eigenvectors(eigenValues, eigenVectors);
   filter_eigenvectors(eigenValues, eigenVectors);
 
   _eigenValues = eigenValues;		//atribute filling for CSU compliance
