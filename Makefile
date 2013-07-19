@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.13 2012/02/16 23:02:03 ferreira Exp $
+# $Id: Makefile,v 1.14 2013/07/19 09:14:47 david Exp $
 #
 # Copyright (C) 2008-2011 INESC ID Lisboa.
 #
@@ -17,6 +17,9 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # $Log: Makefile,v $
+# Revision 1.14  2013/07/19 09:14:47  david
+# *** empty log message ***
+#
 # Revision 1.13  2012/02/16 23:02:03  ferreira
 # *** empty log message ***
 #
@@ -44,7 +47,7 @@ INCLUDEDIR=/usr/include
 QTDIR=$(LIBDIR)/qt4
 EIGEN=$(INCLUDEDIR)/eigen3
 #path for using in x's
-EIGEN=../../eigen
+#EIGEN=../../eigen
 
 CLASSES = Database Database_io Database_debug Database_csuOutput
 

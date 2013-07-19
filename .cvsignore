@@ -6,3 +6,5 @@ eig3Train
 *.out
 eig3RecOne
 eig3RecOnePickOne
+*.a
+*.so
