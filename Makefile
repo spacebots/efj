@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.14 2013/07/19 09:14:47 david Exp $
+# $Id: Makefile,v 1.15 2014/08/04 10:10:33 rzl Exp $
 #
 # Copyright (C) 2008-2011 INESC ID Lisboa.
 #
@@ -17,6 +17,9 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # $Log: Makefile,v $
+# Revision 1.15  2014/08/04 10:10:33  rzl
+# Changed paths to Eigen3 includes from local to /usr/include
+#
 # Revision 1.14  2013/07/19 09:14:47  david
 # *** empty log message ***
 #
@@ -41,11 +44,11 @@
 CC = c++
 
 # default values (openSUSE 11.4, 64 bits)
-LIBDIR=/usr/lib64
-INCLUDEDIR=/usr/include
+LIBDIR     = /usr/lib64
+INCLUDEDIR = /usr/include
 
-QTDIR=$(LIBDIR)/qt4
-EIGEN=$(INCLUDEDIR)/eigen3
+QTDIR = $(LIBDIR)/qt4
+EIGEN = $(INCLUDEDIR)/eigen3
 #path for using in x's
 #EIGEN=../../eigen
 
@@ -53,12 +56,12 @@ CLASSES = Database Database_io Database_debug Database_csuOutput
 
 SRCFILES = $(CLASSES:%=%.cpp)
 OCLASSES = $(CLASSES:%=%.o)
-OFILES = $(OCLASSES)
+OFILES   = $(OCLASSES)
 
 LIBEFJ_SO = libefj.so
-LIBEFJ_A = libefj.a
+LIBEFJ_A  = libefj.a
 
-BASE_CXXFLAGS = -I. -I$(QTDIR)/include/QtCore/ -I$(QTDIR)/include/QtGui -I$(EIGEN) -DPIC -fPIC -pipe 
+BASE_CXXFLAGS = -I. -I$(QTDIR)/include/QtCore/ -I$(QTDIR)/include/QtGui -I$(EIGEN) -DPIC -fPIC -pipe -std=c++11
 # optimize
 #CXXFLAGS = $(BASE_CXXFLAGS) -DDEBUG -DNDEBUG -DEIGEN_NO_DEBUG -O3 -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2 -fmessage-length=0 -Wall -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -D_REENTRANT -fopenmp
 # debug
