@@ -81,7 +81,7 @@ void efj::Database::find_files(const bf::path & dir_path, const std::string & ex
 //const std::string trainDatabasePath = "/afs/l2f.inesc-id.pt/home/ferreira/FaceRec/ImageVault/train";
 bool efj::Database::load_pixels(const std::string &trainDatabasePath) {
   std::vector<QString> files;
-  find_files(trainDatabasePath, ".pgm", files);
+  find_files(trainDatabasePath, ".png", files);
   std::sort(files.begin(), files.end());
 
   if (files.size() == 0)
