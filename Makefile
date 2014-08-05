@@ -52,7 +52,7 @@ EIGEN = $(INCLUDEDIR)/eigen3
 #path for using in x's
 #EIGEN=../../eigen
 
-CLASSES = Database Database_io Database_debug Database_csuOutput
+CLASSES = Database Database_io Database_debug Database_CSU_output
 
 SRCFILES = $(CLASSES:%=%.cpp)
 OCLASSES = $(CLASSES:%=%.o)
