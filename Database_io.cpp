@@ -38,8 +38,8 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 #include <Eigen/Core>
-#include <QImage>
-#include <QString>
+#include <QtGui/QImage>
+#include <QtCore/QString>
 
 #include <efj/Database.h>
 

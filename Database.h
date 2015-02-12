@@ -44,7 +44,7 @@
 #include <string>
 #include <boost/filesystem.hpp>
 
-#include <QString>
+#include <QtCore/QString>
 
 #include <efj/misc.h>
 

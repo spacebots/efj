@@ -47,7 +47,7 @@ CC = c++
 LIBDIR     = /usr/lib64
 INCLUDEDIR = /usr/include
 
-QTDIR = $(LIBDIR)/qt4
+QTDIR = $(INCLUDEDIR)/qt4
 EIGEN = $(INCLUDEDIR)/eigen3
 #path for using in x's
 #EIGEN=../../eigen
@@ -61,7 +61,7 @@ OFILES   = $(OCLASSES)
 LIBEFJ_SO = libefj.so
 LIBEFJ_A  = libefj.a
 
-BASE_CXXFLAGS = -I. -I$(QTDIR)/include/QtCore/ -I$(QTDIR)/include/QtGui -I$(EIGEN) -DPIC -fPIC -pipe -std=c++11
+BASE_CXXFLAGS = -I. -I$(QTDIR) -I$(EIGEN) -DPIC -fPIC -pipe -std=c++11
 # optimize
 #CXXFLAGS = $(BASE_CXXFLAGS) -DDEBUG -DNDEBUG -DEIGEN_NO_DEBUG -O3 -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2 -fmessage-length=0 -Wall -D_FORTIFY_SOURCE=2 -fstack-protector -funwind-tables -fasynchronous-unwind-tables -D_REENTRANT -fopenmp
 # debug

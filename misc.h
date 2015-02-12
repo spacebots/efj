@@ -28,7 +28,7 @@
 #define __EFJ_MISC_H__
 
 #include <Eigen/Core>
-#include <QImage>
+#include <QtGui/QImage>
 
 namespace efj {
   template<typename MatrixType>
